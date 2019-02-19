@@ -58,6 +58,8 @@
 </template>
 
 <script>
+import Vue from "vue";
+import Component from "vue-class-component";
 import { mapActions } from "vuex";
 import TodoItem from "./TodoItem.vue";
 
@@ -67,41 +69,44 @@ const filters = {
   completed: todos => todos.filter(todo => todo.done)
 };
 
-export default {
+@Component({
   components: { TodoItem },
-  data() {
-    return {
-      visibility: "all",
-      filters: filters
-    };
-  },
-  computed: {
-    todos() {
-      return this.$store.state.todos;
-    },
-    allChecked() {
-      return this.todos.every(todo => todo.done);
-    },
-    filteredTodos() {
-      return filters[this.visibility](this.todos);
-    },
-    remaining() {
-      return this.todos.filter(todo => !todo.done).length;
-    }
-  },
   methods: {
     ...mapActions(["toggleAll", "clearCompleted"]),
-    addTodo(e) {
-      const text = e.target.value;
-      if (text.trim()) {
-        this.$store.dispatch("addTodo", text);
-      }
-      e.target.value = "";
-    }
   },
   filters: {
     pluralize: (n, w) => (n === 1 ? w : w + "s"),
     capitalize: s => s.charAt(0).toUpperCase() + s.slice(1)
   }
-};
+})
+export default class App extends Vue {
+
+  visibility = "all";
+
+  get filteredTodos() {
+    return filters[this.visibility](this.todos);
+  }
+
+  get todos() {
+    return this.$store.state.todos;
+  }
+
+  get allChecked() {
+    return this.todos.every(todo => todo.done);
+  }
+
+  get remaining() {
+    return this.todos.filter(todo => !todo.done).length;
+  }
+
+  addTodo(e) {
+    const text = e.target.value;
+    if (text.trim()) {
+      this.$store.dispatch("addTodo", text);
+    }
+    e.target.value = "";
+  }
+
+}
+
 </script>

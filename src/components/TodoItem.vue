@@ -23,16 +23,12 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import Vue from "vue";
+import Component from "vue-class-component";
+import { mapActions } from 'vuex';
 
-export default {
-  name: "Todo",
+@Component({
   props: ["todo"],
-  data() {
-    return {
-      editing: false
-    };
-  },
   directives: {
     focus(el, { value }, { context }) {
       if (value) {
@@ -43,24 +39,32 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["editTodo", "toggleTodo", "removeTodo"]),
-    doneEdit(e) {
-      const value = e.target.value.trim();
-      const { todo } = this;
-      if (!value) {
-        this.removeTodo(todo);
-      } else if (this.editing) {
-        this.editTodo({
-          todo,
-          value
-        });
-        this.editing = false;
-      }
-    },
-    cancelEdit(e) {
-      e.target.value = this.todo.text;
+    ...mapActions(["editTodo", "toggleTodo", "removeTodo"])
+  }
+})
+export default class TodoItem extends Vue {
+
+  editing = false;
+
+  doneEdit(e) {
+    const value = e.target.value.trim();
+    const { todo } = this;
+    if (!value) {
+      this.removeTodo(todo);
+    } else if (this.editing) {
+      this.editTodo({
+        todo,
+        value
+      });
       this.editing = false;
     }
   }
-};
+
+  cancelEdit(e) {
+    e.target.value = this.todo.text;
+    this.editing = false;
+  }
+
+}
+
 </script>
