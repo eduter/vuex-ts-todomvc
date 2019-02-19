@@ -25,7 +25,7 @@
 <script>
 import Vue from "vue";
 import Component from "vue-class-component";
-import { mapActions } from 'vuex';
+import { mapActions } from "vuex";
 
 @Component({
   props: ["todo"],
@@ -43,7 +43,6 @@ import { mapActions } from 'vuex';
   }
 })
 export default class TodoItem extends Vue {
-
   editing = false;
 
   doneEdit(e) {
@@ -64,7 +63,5 @@ export default class TodoItem extends Vue {
     e.target.value = this.todo.text;
     this.editing = false;
   }
-
 }
-
 </script>

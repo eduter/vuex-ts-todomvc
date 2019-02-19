@@ -37,7 +37,7 @@
         {{ remaining | pluralize("item") }} left
       </span>
       <ul class="filters">
-        <li v-for="(val, key) in filters">
+        <li v-for="(val, key) in filters" :key="key">
           <a
             :href="'#/' + key"
             :class="{ selected: visibility === key }"
@@ -63,16 +63,10 @@ import Component from "vue-class-component";
 import { mapActions } from "vuex";
 import TodoItem from "./TodoItem.vue";
 
-const filters = {
-  all: todos => todos,
-  active: todos => todos.filter(todo => !todo.done),
-  completed: todos => todos.filter(todo => todo.done)
-};
-
 @Component({
   components: { TodoItem },
   methods: {
-    ...mapActions(["toggleAll", "clearCompleted"]),
+    ...mapActions(["toggleAll", "clearCompleted"])
   },
   filters: {
     pluralize: (n, w) => (n === 1 ? w : w + "s"),
@@ -80,11 +74,17 @@ const filters = {
   }
 })
 export default class App extends Vue {
-
   visibility = "all";
+  filters = this.constructor.filters;
+
+  static filters = {
+    all: todos => todos,
+    active: todos => todos.filter(todo => !todo.done),
+    completed: todos => todos.filter(todo => todo.done)
+  };
 
   get filteredTodos() {
-    return filters[this.visibility](this.todos);
+    return this.filters[this.visibility](this.todos);
   }
 
   get todos() {
@@ -106,7 +106,5 @@ export default class App extends Vue {
     }
     e.target.value = "";
   }
-
 }
-
 </script>
