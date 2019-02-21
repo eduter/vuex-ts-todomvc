@@ -2,7 +2,7 @@ import "babel-polyfill";
 import Vue from "vue";
 import App from "./components/App.vue";
 // @ts-ignore
-import store from "./store/index";
+import store from "./store";
 
 Vue.config.productionTip = false;
 
