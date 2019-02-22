@@ -57,52 +57,54 @@
   </section>
 </template>
 
-<script>
-import Vue from "vue";
+<script lang="ts">
 import Component from "vue-class-component";
-import { mapActions } from "vuex";
 import TodoItem from "./TodoItem.vue";
+import { RootState, ToDo } from "@/store/types";
+import { Actions } from "@/store/actions";
+import { mapAction, Vue } from "@/utils/vuex";
 
 @Component({
   components: { TodoItem },
-  methods: {
-    ...mapActions(["toggleAll", "clearCompleted"])
-  },
   filters: {
-    pluralize: (n, w) => (n === 1 ? w : w + "s"),
-    capitalize: s => s.charAt(0).toUpperCase() + s.slice(1)
+    pluralize: (n: number, w: string) => (n === 1 ? w : w + "s"),
+    capitalize: (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
   }
 })
-export default class App extends Vue {
+export default class App extends Vue<RootState, Actions> {
   visibility = "all";
-  filters = this.constructor.filters;
+  filters = App.filters;
 
-  static filters = {
-    all: todos => todos,
-    active: todos => todos.filter(todo => !todo.done),
-    completed: todos => todos.filter(todo => todo.done)
+  addTodoAction = mapAction<App, Actions, "addTodo">(this, "addTodo");
+  toggleAll = mapAction<App, Actions, "toggleAll">(this, "toggleAll");
+  clearCompleted = mapAction<App, Actions, "clearCompleted">(this, "clearCompleted");
+
+  static filters: { [key: string]: (todos: ToDo[]) => ToDo[] } = {
+    all: (todos: ToDo[]) => todos,
+    active: (todos: ToDo[]) => todos.filter(todo => !todo.done),
+    completed: (todos: ToDo[]) => todos.filter(todo => todo.done)
   };
 
-  get filteredTodos() {
+  get filteredTodos(): ToDo[] {
     return this.filters[this.visibility](this.todos);
   }
 
-  get todos() {
+  get todos(): ToDo[] {
     return this.$store.state.todos;
   }
 
-  get allChecked() {
+  get allChecked(): boolean {
     return this.todos.every(todo => todo.done);
   }
 
-  get remaining() {
+  get remaining(): number {
     return this.todos.filter(todo => !todo.done).length;
   }
 
-  addTodo(e) {
+  addTodo(e: any): void {
     const text = e.target.value;
     if (text.trim()) {
-      this.$store.dispatch("addTodo", text);
+      this.addTodoAction(text);
     }
     e.target.value = "";
   }

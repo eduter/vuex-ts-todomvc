@@ -22,44 +22,45 @@
   </li>
 </template>
 
-<script>
-import Vue from "vue";
+<script lang="ts">
 import Component from "vue-class-component";
-import { mapActions } from "vuex";
+import { mapAction, Vue } from "@/utils/vuex";
+import { RootState, ToDo } from "@/store/types";
+import { Actions } from "@/store/actions";
 
 @Component({
   props: ["todo"],
   directives: {
     focus(el, { value }, { context }) {
       if (value) {
+        // @ts-ignore
         context.$nextTick(() => {
           el.focus();
         });
       }
     }
-  },
-  methods: {
-    ...mapActions(["editTodo", "toggleTodo", "removeTodo"])
   }
 })
-export default class TodoItem extends Vue {
+export default class TodoItem extends Vue<RootState, Actions> {
   editing = false;
+  todo!: ToDo;
 
-  doneEdit(e) {
-    const value = e.target.value.trim();
+  editTodo = mapAction<TodoItem, Actions, "editTodo">(this, "editTodo");
+  removeTodo = mapAction<TodoItem, Actions, "removeTodo">(this, "removeTodo");
+  toggleTodo = mapAction<TodoItem, Actions, "toggleTodo">(this, "toggleTodo");
+
+  doneEdit(e: any) {
+    const text = e.target.value.trim();
     const { todo } = this;
-    if (!value) {
+    if (!text) {
       this.removeTodo(todo);
     } else if (this.editing) {
-      this.editTodo({
-        todo,
-        value
-      });
+      this.editTodo({ todo, text });
       this.editing = false;
     }
   }
 
-  cancelEdit(e) {
+  cancelEdit(e: any) {
     e.target.value = this.todo.text;
     this.editing = false;
   }
