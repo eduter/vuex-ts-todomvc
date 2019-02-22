@@ -1,7 +1,9 @@
 import { ActionContext } from "vuex";
 import { RootState, ToDo } from "@/store/types";
 
-export default {
+export type Actions = typeof actions;
+
+const actions = {
   addTodo(context: ActionContext<RootState, RootState>, text: string) {
     context.commit("addTodo", {
       text,
@@ -38,3 +40,5 @@ export default {
       });
   }
 };
+
+export default actions;
