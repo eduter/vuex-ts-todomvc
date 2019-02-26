@@ -37,13 +37,14 @@
         {{ remaining | pluralize("item") }} left
       </span>
       <ul class="filters">
-        <li v-for="(val, key) in filters" :key="key">
+        <li v-for="filter in ToDoFilters" :key="filter">
           <a
-            :href="'#/' + key"
-            :class="{ selected: visibility === key }"
-            @click="visibility = key"
-            >{{ key | capitalize }}</a
+            :href="'#/' + filter"
+            :class="{ selected: visibility === filter }"
+            @click="visibility = filter"
           >
+            {{ filter }}
+          </a>
         </li>
       </ul>
       <button
@@ -63,29 +64,37 @@ import { BaseComponent, mapAction } from "@/utils/BaseComponent";
 import Component from "vue-class-component";
 import TodoItem from "./TodoItem.vue";
 
+enum ToDoFilters {
+  ALL = "All",
+  ACTIVE = "Active",
+  COMPLETED = "Completed"
+}
+
 @Component({
   components: { TodoItem },
   filters: {
-    pluralize: (n: number, w: string) => (n === 1 ? w : w + "s"),
-    capitalize: (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+    pluralize: (n: number, w: string) => (n === 1 ? w : w + "s")
   }
 })
 export default class App extends BaseComponent {
-  visibility = "all";
-  filters = App.filters;
+  ToDoFilters = ToDoFilters;
+  visibility = ToDoFilters.ALL;
 
   addTodoAction = mapAction<"addTodo">(this, "addTodo");
   toggleAll = mapAction<"toggleAll">(this, "toggleAll");
   clearCompleted = mapAction<"clearCompleted">(this, "clearCompleted");
 
-  static filters: { [key: string]: (todos: ToDo[]) => ToDo[] } = {
-    all: (todos: ToDo[]) => todos,
-    active: (todos: ToDo[]) => todos.filter(todo => !todo.done),
-    completed: (todos: ToDo[]) => todos.filter(todo => todo.done)
-  };
-
   get filteredTodos(): ToDo[] {
-    return this.filters[this.visibility](this.todos);
+    switch (this.visibility) {
+      case ToDoFilters.ALL:
+        return this.$store.getters.allTodos;
+      case ToDoFilters.ACTIVE:
+        return this.$store.getters.activeTodos;
+      case ToDoFilters.COMPLETED:
+        return this.$store.getters.completedTodos;
+      default:
+        throw Error(`Unknown visibility "${this.visibility}"`);
+    }
   }
 
   get todos(): ToDo[] {
