@@ -59,9 +59,11 @@
 </template>
 
 <script lang="ts">
+import { Getters } from "@/store/getters";
 import { ToDo } from "@/store/types";
 import { BaseComponent, mapAction } from "@/utils/BaseComponent";
 import Component from "vue-class-component";
+import { Getter } from "vuex-class";
 import TodoItem from "./TodoItem.vue";
 
 enum ToDoFilters {
@@ -84,32 +86,32 @@ export default class App extends BaseComponent {
   toggleAll = mapAction<"toggleAll">(this, "toggleAll");
   clearCompleted = mapAction<"clearCompleted">(this, "clearCompleted");
 
+  @Getter("allTodos") private todos!: Getters["allTodos"];
+  @Getter("activeTodos") private activeTodos!: Getters["activeTodos"];
+  @Getter("completedTodos") private completedTodos!: Getters["completedTodos"];
+
   get filteredTodos(): ToDo[] {
     switch (this.visibility) {
       case ToDoFilters.ALL:
-        return this.$store.getters.allTodos;
+        return this.todos;
       case ToDoFilters.ACTIVE:
-        return this.$store.getters.activeTodos;
+        return this.activeTodos;
       case ToDoFilters.COMPLETED:
-        return this.$store.getters.completedTodos;
+        return this.completedTodos;
       default:
         throw Error(`Unknown visibility "${this.visibility}"`);
     }
   }
 
-  get todos(): ToDo[] {
-    return this.$store.state.todos;
+  get allChecked() {
+    return this.remaining === 0;
   }
 
-  get allChecked(): boolean {
-    return this.todos.every(todo => todo.done);
+  get remaining() {
+    return this.activeTodos.length;
   }
 
-  get remaining(): number {
-    return this.todos.filter(todo => !todo.done).length;
-  }
-
-  addTodo(e: any): void {
+  addTodo(e: any) {
     const text = e.target.value;
     if (text.trim()) {
       this.addTodoAction(text);

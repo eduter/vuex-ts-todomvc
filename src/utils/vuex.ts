@@ -31,6 +31,10 @@ type ActionMap = {
   [key: string]: (...args: any[]) => any;
 };
 
+export type GetterTypes<T extends { [key: string]: (...args: any) => any }> = {
+  [P in keyof T]: ReturnType<T[P]>
+};
+
 /**
  * Returns a Vuex action to map to a component's property.
  *

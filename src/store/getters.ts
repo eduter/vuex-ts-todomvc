@@ -1,6 +1,7 @@
+import { GetterTypes } from "@/utils/vuex";
 import { RootState } from "./types";
 
-export type Getters = typeof getters;
+export type Getters = GetterTypes<typeof getters>;
 
 const getters = {
   allTodos: (state: RootState) => state.todos,
