@@ -1,6 +1,5 @@
 import { Store as OriginalStore } from "vuex";
 import { Vue as OriginalVue } from "vue-property-decorator";
-import { ComponentOptions } from "vue";
 
 /**
  * Class for typesafe Vue components.
@@ -9,10 +8,6 @@ import { ComponentOptions } from "vue";
  */
 class Vue<R, A extends ActionMap> extends OriginalVue {
   $store!: Store<R, A>;
-
-  constructor(options?: ComponentOptions<Vue<R, A>>) {
-    super(options);
-  }
 }
 
 declare class Store<R, A extends ActionMap> extends OriginalStore<R> {

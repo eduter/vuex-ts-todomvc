@@ -23,10 +23,9 @@
 </template>
 
 <script lang="ts">
+import { ToDo } from "@/store/types";
+import { BaseComponent, mapAction } from "@/utils/BaseComponent";
 import Component from "vue-class-component";
-import { mapAction, Vue } from "@/utils/vuex";
-import { RootState, ToDo } from "@/store/types";
-import { Actions } from "@/store/actions";
 
 @Component({
   props: ["todo"],
@@ -41,13 +40,13 @@ import { Actions } from "@/store/actions";
     }
   }
 })
-export default class TodoItem extends Vue<RootState, Actions> {
+export default class TodoItem extends BaseComponent {
   editing = false;
   todo!: ToDo;
 
-  editTodo = mapAction<TodoItem, Actions, "editTodo">(this, "editTodo");
-  removeTodo = mapAction<TodoItem, Actions, "removeTodo">(this, "removeTodo");
-  toggleTodo = mapAction<TodoItem, Actions, "toggleTodo">(this, "toggleTodo");
+  editTodo = mapAction<"editTodo">(this, "editTodo");
+  removeTodo = mapAction<"removeTodo">(this, "removeTodo");
+  toggleTodo = mapAction<"toggleTodo">(this, "toggleTodo");
 
   doneEdit(e: any) {
     const text = e.target.value.trim();

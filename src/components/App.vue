@@ -58,11 +58,10 @@
 </template>
 
 <script lang="ts">
+import { ToDo } from "@/store/types";
+import { BaseComponent, mapAction } from "@/utils/BaseComponent";
 import Component from "vue-class-component";
 import TodoItem from "./TodoItem.vue";
-import { RootState, ToDo } from "@/store/types";
-import { Actions } from "@/store/actions";
-import { mapAction, Vue } from "@/utils/vuex";
 
 @Component({
   components: { TodoItem },
@@ -71,13 +70,13 @@ import { mapAction, Vue } from "@/utils/vuex";
     capitalize: (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
   }
 })
-export default class App extends Vue<RootState, Actions> {
+export default class App extends BaseComponent {
   visibility = "all";
   filters = App.filters;
 
-  addTodoAction = mapAction<App, Actions, "addTodo">(this, "addTodo");
-  toggleAll = mapAction<App, Actions, "toggleAll">(this, "toggleAll");
-  clearCompleted = mapAction<App, Actions, "clearCompleted">(this, "clearCompleted");
+  addTodoAction = mapAction<"addTodo">(this, "addTodo");
+  toggleAll = mapAction<"toggleAll">(this, "toggleAll");
+  clearCompleted = mapAction<"clearCompleted">(this, "clearCompleted");
 
   static filters: { [key: string]: (todos: ToDo[]) => ToDo[] } = {
     all: (todos: ToDo[]) => todos,
