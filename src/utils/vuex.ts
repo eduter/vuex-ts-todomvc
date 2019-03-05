@@ -6,12 +6,21 @@ import { Vue as OriginalVue } from "vue-property-decorator";
  *   R is the type of the root state
  *   A is the type of the actions object
  */
-class Vue<R, A extends ActionMap> extends OriginalVue {
-  $store!: Store<R, A>;
+class Vue<
+  R,
+  A extends ActionMap,
+  G extends GetterDefinitions
+> extends OriginalVue {
+  $store!: Store<R, A, G>;
 }
 
-declare class Store<R, A extends ActionMap> extends OriginalStore<R> {
+declare class Store<
+  R,
+  A extends ActionMap,
+  G extends GetterDefinitions
+> extends OriginalStore<R> {
   dispatch: Dispatch<A>;
+  getters: GetterTypes<G>;
 }
 
 interface Dispatch<A extends ActionMap> {
@@ -31,7 +40,9 @@ type ActionMap = {
   [key: string]: (...args: any[]) => any;
 };
 
-export type GetterTypes<T extends { [key: string]: (...args: any) => any }> = {
+type GetterDefinitions = { [key: string]: (...args: any) => any };
+
+export type GetterTypes<T extends GetterDefinitions> = {
   [P in keyof T]: ReturnType<T[P]>
 };
 
@@ -42,7 +53,7 @@ export type GetterTypes<T extends { [key: string]: (...args: any) => any }> = {
  * @param action
  */
 function mapAction<
-  T extends Vue<any, A>,
+  T extends Vue<any, A, any>,
   A extends ActionMap,
   K extends keyof A
 >(component: T, action: K): (a: Arg2<A[K]>) => Promise<any> {

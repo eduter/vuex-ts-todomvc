@@ -13,7 +13,7 @@
       />
     </header>
     <!-- main section -->
-    <section class="main" v-show="todos.length">
+    <section class="main" v-show="todosCount">
       <input
         class="toggle-all"
         id="toggle-all"
@@ -31,7 +31,7 @@
       </ul>
     </section>
     <!-- footer -->
-    <footer class="footer" v-show="todos.length">
+    <footer class="footer" v-show="todosCount">
       <span class="todo-count">
         <strong>{{ remaining }}</strong>
         {{ remaining | pluralize("item") }} left
@@ -49,7 +49,7 @@
       </ul>
       <button
         class="clear-completed"
-        v-show="todos.length > remaining"
+        v-show="todosCount > remaining"
         @click="clearCompleted"
       >
         Clear completed
@@ -59,11 +59,9 @@
 </template>
 
 <script lang="ts">
-import { Getters } from "@/store/getters";
 import { ToDo } from "@/store/types";
 import { BaseComponent, mapAction } from "@/utils/BaseComponent";
 import Component from "vue-class-component";
-import { Getter } from "vuex-class";
 import TodoItem from "./TodoItem.vue";
 
 enum ToDoFilters {
@@ -82,18 +80,20 @@ export default class App extends BaseComponent {
   ToDoFilters = ToDoFilters;
   visibility = ToDoFilters.ALL;
 
-  addTodoAction = mapAction<"addTodo">(this, "addTodo");
-  toggleAll = mapAction<"toggleAll">(this, "toggleAll");
+  toggleAll = mapAction<"editTodo">(this, "editTodo");
   clearCompleted = mapAction<"clearCompleted">(this, "clearCompleted");
 
-  @Getter("allTodos") private todos!: Getters["allTodos"];
-  @Getter("activeTodos") private activeTodos!: Getters["activeTodos"];
-  @Getter("completedTodos") private completedTodos!: Getters["completedTodos"];
+  /* prettier-ignore */ get activeTodos() { return this.$store.getters.activeTodos }
+  /* prettier-ignore */ get completedTodos() { return this.$store.getters.completedTodos }
+
+  get todosCount() {
+    return this.$store.getters.allTodos.length;
+  }
 
   get filteredTodos(): ToDo[] {
     switch (this.visibility) {
       case ToDoFilters.ALL:
-        return this.todos;
+        return this.$store.getters.allTodos;
       case ToDoFilters.ACTIVE:
         return this.activeTodos;
       case ToDoFilters.COMPLETED:
@@ -114,7 +114,7 @@ export default class App extends BaseComponent {
   addTodo(e: any) {
     const text = e.target.value;
     if (text.trim()) {
-      this.addTodoAction(text);
+      this.$store.dispatch("addTodo", text);
     }
     e.target.value = "";
   }
