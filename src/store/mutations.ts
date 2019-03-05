@@ -1,7 +1,5 @@
 import { RootState, ToDo } from "@/store/types";
 
-export const STORAGE_KEY = "todos-vuejs";
-
 // for testing
 if (navigator.userAgent.indexOf("PhantomJS") > -1) {
   window.localStorage.clear();
@@ -9,11 +7,13 @@ if (navigator.userAgent.indexOf("PhantomJS") > -1) {
 
 interface EditToDoPayload {
   todo: ToDo;
-  text: ToDo["text"];
-  done: ToDo["done"];
+  text?: ToDo["text"];
+  done?: ToDo["done"];
 }
 
-export const mutations = {
+export type Mutations = typeof mutations;
+
+const mutations = {
   addTodo(state: RootState, todo: ToDo) {
     state.todos.push(todo);
   },
@@ -30,3 +30,5 @@ export const mutations = {
     todo.done = done;
   }
 };
+
+export default mutations;

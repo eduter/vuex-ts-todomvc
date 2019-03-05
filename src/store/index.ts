@@ -1,9 +1,11 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import { mutations, STORAGE_KEY } from "./mutations";
 import actions from "./actions";
 import getters from "./getters";
+import mutations from "./mutations";
 import plugins from "./plugins";
+
+export const STORAGE_KEY = "todos-vuejs";
 
 Vue.use(Vuex);
 

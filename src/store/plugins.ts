@@ -1,4 +1,4 @@
-import { STORAGE_KEY } from "./mutations";
+import { STORAGE_KEY } from "./index";
 import { MutationPayload, Store } from "vuex";
 import { RootState } from "@/store/types";
 

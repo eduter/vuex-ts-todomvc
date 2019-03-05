@@ -1,4 +1,4 @@
-import { Store as OriginalStore } from "vuex";
+import { ActionContext, CommitOptions, Store as OriginalStore } from "vuex";
 import { Vue as OriginalVue } from "vue-property-decorator";
 
 /**
@@ -25,26 +25,46 @@ declare class Store<
 
 interface Dispatch<A extends ActionMap> {
   <K extends keyof A>(type: K, payload: Arg2<A[K]>): Promise<any>;
-  <P extends Payload<A>>(payloadWithType: P): Promise<any>;
+  <P extends PayloadWithType<A>>(payloadWithType: P): Promise<any>;
 }
 
 type Arg2<F> = F extends (arg1: any, arg2: infer A, ...args: any[]) => any
   ? A
   : never;
 
-export interface Payload<A extends ActionMap> {
-  type: [keyof A];
+export interface PayloadWithType<M extends MethodMap> {
+  type: [keyof M];
 }
 
-type ActionMap = {
+type MethodMap = {
   [key: string]: (...args: any[]) => any;
 };
+
+type ActionMap = MethodMap;
+
+type MutationMap = MethodMap;
 
 type GetterDefinitions = { [key: string]: (...args: any) => any };
 
 export type GetterTypes<T extends GetterDefinitions> = {
   [P in keyof T]: ReturnType<T[P]>
 };
+
+export interface Context<R, M extends MutationMap> extends ActionContext<R, R> {
+  commit: Commit<M>;
+}
+
+export interface Commit<M extends MutationMap> {
+  <P extends PayloadWithType<M>>(
+    payloadWithType: P,
+    options?: CommitOptions
+  ): void;
+  <K extends keyof M>(
+    type: K,
+    payload?: Arg2<M[K]>,
+    options?: CommitOptions
+  ): void;
+}
 
 /**
  * Returns a Vuex action to map to a component's property.
