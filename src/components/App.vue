@@ -63,6 +63,7 @@ import { ToDo } from "@/store/types";
 import { BaseComponent, mapAction } from "@/utils/BaseComponent";
 import Component from "vue-class-component";
 import TodoItem from "./TodoItem.vue";
+import { assertNever } from "@/utils/assert";
 
 enum ToDoFilters {
   ALL = "All",
@@ -99,7 +100,7 @@ export default class App extends BaseComponent {
       case ToDoFilters.COMPLETED:
         return this.completedTodos;
       default:
-        throw Error(`Unknown visibility "${this.visibility}"`);
+        return assertNever(this.visibility);
     }
   }
 
