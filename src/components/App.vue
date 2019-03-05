@@ -81,7 +81,7 @@ export default class App extends BaseComponent {
   ToDoFilters = ToDoFilters;
   visibility = ToDoFilters.ALL;
 
-  toggleAll = mapAction<"editTodo">(this, "editTodo");
+  toggleAll = mapAction<"toggleAll">(this, "toggleAll");
   clearCompleted = mapAction<"clearCompleted">(this, "clearCompleted");
 
   /* prettier-ignore */ get activeTodos() { return this.$store.getters.activeTodos }
