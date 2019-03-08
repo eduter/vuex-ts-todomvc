@@ -24,12 +24,13 @@ declare class Store<
 }
 
 interface Dispatch<A extends ActionMap> {
-  <K extends keyof A>(type: K, payload: Arg2<A[K]>): Promise<any>;
   <P extends PayloadWithType<A>>(payloadWithType: P): Promise<any>;
+  <K extends keyof A>(type: K, payload: Arg2<A[K]>): Promise<any>;
 }
 
-type Arg2<F> = F extends (arg1: any, arg2: infer A, ...args: any[]) => any
-  ? A
+// prettier-ignore
+type Arg2<F> = F extends (arg1: any) => any ? undefined
+  : F extends (arg1: any, arg2: infer A, ...args: any[]) => any ? A
   : never;
 
 export interface PayloadWithType<M extends MethodMap> {
@@ -76,8 +77,24 @@ function mapAction<
   T extends Vue<any, A, any>,
   A extends ActionMap,
   K extends keyof A
->(component: T, action: K): (a: Arg2<A[K]>) => Promise<any> {
+>(component: T, action: K): MappedAction<T, A, K> {
+  /*
+    Because `(param: T | undefined) => any` is not the same as `(param?: T) => any` in TypeScript
+    (https://github.com/Microsoft/TypeScript/issues/12400), I had to use a workaround. Instead of letting TS compiler
+    infer the type of the expression below, I declare the return type in the function's signature and disable type
+    checking for the return statement.
+    From the point of view of the consumer of this function, everything seems to work as intended.
+   */
+  // @ts-ignore
   return (payload: Arg2<A[K]>) => component.$store.dispatch(action, payload);
 }
+
+type MappedAction<
+  T extends Vue<any, A, any>,
+  A extends ActionMap,
+  K extends keyof A
+> = Arg2<A[K]> extends undefined
+  ? () => Promise<any>
+  : (payload: Arg2<A[K]>) => Promise<any>;
 
 export { Vue, mapAction };
